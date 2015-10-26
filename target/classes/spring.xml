@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+    
+<!-- For the annotation used in the bean class we have to define the package that is to be scanned  -->
+<context:annotation-config/>
+<context:component-scan base-package="com.avinash"/>
+    
+<bean id="triangle" class="com.avinash.beanclasses.Triangle" >
+    <property name = "type" value ="Equilateral"/> 
+</bean>
+<bean id="square" class="com.avinash.beanclasses.Square">
+   <!--   <property name = "type" value = " Square of type A"/>
+   Using constructor injection for Square bean instead of Setter getter injection
+   --> 
+ <!--   <constructor-arg name = "type" value = "Square from Const"/>
+  Overloading constructors
+  -->
+  
+  <!--  
+  <constructor-arg name = "type" value = "Square from Const"/>
+  <constructor-arg name = "size" value = "Medium"/>
+  constructor have type only string in our xml
+  -->
+  
+  <constructor-arg type="java.lang.Integer" value = "20"/>
+  
+  <!-- Instead of type you can use index also to distingusih between the type and 
+     the constructor to be called 
+     <constructor-arg name = "type" value = "Square from Const"/>
+     <constructor-arg name = "type" value = "Square from Const"/>
+     <constructor-arg index = "0" value = "Square from Const"/>
+     <constructor-arg name =  "2" value = "20"/>
+     Now in square class define a constructor with args type and height for this bean to be used
+     
+     -->
+  
+  
+</bean>
+<bean id="circle" class="com.avinash.beanclasses.Circle">
+    <property name = "type" value = " A circle of type A"/> 
+</bean>
+
+
+<!-- Bean for Object Injection  -->
+<bean id = "triangleWithPoints" class = "com.avinash.beanclasses.TraingleWithPoints">
+<property name = "pointA" ref = "pointA"/>
+<!-- Ineer bean We wil use point B and C as inner bean.this is because these two points are specific to this triangle
+how ever point A with (0,0) can be used by other sahpes too so that it will be kept as an outer bean  -->
+<property name = "pointB">
+    <bean  class = "com.avinash.beanclasses.Point">
+<property name = "x" value = "10"/>
+<property name = "y" value = "10"/>  
+</bean>
+</property>
+
+<property name = "pointC">
+<bean  class = "com.avinash.beanclasses.Point">
+<property name = "x" value = "20"/>
+<property name = "y" value = "20"/>  
+</bean>
+</property>
+</bean>
+
+<!-- Inheritance of the bean  -->
+<bean id="triangle1" class = "com.avinash.beanclasses.TraingleWithPoints" parent="triangleWithPoints">    
+</bean>
+
+
+<bean id = "pointA" class = "com.avinash.beanclasses.Point">
+<property name = "x" value = "0"/>
+<property name = "y" value = "0"/>  
+</bean>
+<!--
+These two beans are now used as inner beans
+ 
+<bean id = "pointB" class = "com.avinash.beanclasses.Point">
+<property name = "x" value = "10"/>
+<property name = "y" value = "10"/>  
+</bean>
+
+<bean id = "pointC" class = "com.avinash.beanclasses.Point">
+<property name = "x" value = "20"/>
+<property name = "y" value = "20"/>  
+</bean>
+ -->
+ <!-- Alias is the way to give different name to a bean and use that bean with the alias name  -->
+ <alias name="triangleWithPoints" alias="traingle-alias"/>
+ 
+ <!-- Scope of a bean may be singleton,prototype,request,session,globalsession -->
+ <!-- Bean wit autowire as type -->
+ <bean id = "CircleWithCenter" class = "com.avinash.beanclasses.CircleWithCenter" autowire="byType" scope = "prototype">
+ </bean>
+ 
+ <!-- Bean initilization with collection as parameter -->
+ 
+ 
+ <bean id="trianglewithpointlists" class = "com.avinash.beanclasses.TriangleWithListOfPoints" >
+     <property name = "points">
+     <list>
+     <ref bean ="pointA" />  
+     <ref bean ="pointA" />
+     <ref bean ="pointA" />
+     </list>
+     </property>
+ </bean>   
+ 
+ <!-- Bean for getting message from the properties file -->
+ <bean id ="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+ <property name="basenames">
+ 	<list>
+ 	<value>myProperties</value>
+ 	</list>
+ </property>
+ 
+ </bean>
+ 
+ <!-- Bean for application context -->
+ <bean id = "TriangleWithApplicationContext" class = "com.avinash.beanclasses.TriangleWithApplicationContext">
+ <property name = "pointA" ref = "pointA"/>
+ <property name = "pointB">
+    <bean  class = "com.avinash.beanclasses.Point">
+<property name = "x" value = "10"/>
+<property name = "y" value = "10"/>  
+</bean>
+</property>
+<property name = "pointC">
+    <bean  class = "com.avinash.beanclasses.Point">
+<property name = "x" value = "10"/>
+<property name = "y" value = "10"/>  
+</bean>
+</property>
+ </bean>    
+ </beans>
