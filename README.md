@@ -233,6 +233,154 @@ There are four modes of autowiring a bean using an XML configuration:
 ##### constructor: autowiring is done based on constructor arguments, meaning Spring will look for beans with the same type as the constructor arguments
 
 
+## What Are Profiles?
+
+Every enterprise application has many environments, like:
+
+Dev | Test | Stage | Prod | UAT / Pre-Prod
+
+Each environment requires a setting that is specific to them. For example, in DEV, we do not need to constantly check database consistency. Whereas in TEST and STAGE, we need to. These environments host specific configurations called Profiles.
+
+### How Do we Maintain Profiles?
+
+This is simple — properties files!
+We make properties files for each environment and set the profile in the application accordingly, so it will pick the respective properties file.
+
+In this demo application, we will see how to configure different databases at runtime based on the specific environment by their respective profiles.
+
+As the DB connection is better to be kept in a property file, it remains external to an application and can be changed. We will do so here. But, Spring Boot — by default — provides just one property file ( application.properties). So, how will we segregate the properties based on the environment?
+
+The solution would be to create more property files and add the "profile" name as the suffix and configure Spring Boot to pick the appropriate properties based on the profile.
+
+Then, we need to create three  application.properties:
+
+     application-dev.properties 
+     application-test.properties 
+     application-prod.properties 
+
+Of course, the application.properties will remain as a master properties file, but if we override any key in the profile-specific file, the latter will gain precedence.
+
+I will now define DB configuration properties for in respective properties file and add code in DBConfiguration.class to pick the appropriate settings.
+
+##### Here is the base  application.properties:
+spring.profiles.active=prod
+spring.application.name=Profiles
+app.message=This is the primary Application Property for ${spring.application.name} 
+
+###### In DEV, we will use an in-memory database:
+#DEV ENVIRONEMNT SETTING#
+app.message= This is the property file for the ${spring.application.name} specific to DEV Environment
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.url=jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+spring.datasource.username=sa
+spring.datasource.password=sa
+
+##### In TEST, we will be using a lower instance of RDS MySQL database, and in PROD, we will use a higher instance of the MySQL database. (It's the price that matters...)
+#TEST ENVIRONEMNT SETTING#
+app.message= This is the property file for the ${spring.application.name} specific to TEST Environment
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql-instance1.sovanmaws.us-east-1.rds.amazonaws.com:3306/profiles
+spring.datasource.username=<USERNAME>
+spring.datasource.password=<SECRET>
+	
+Now, we are done with properties files. Let's configure in the DBConfiguration.class to pick the correct one
+@Configuration
+@ConfigurationProperties("spring.datasource")
+public class DBConfiguration {
+	
+	private String driverClassName;
+	private String url;
+	private String username;
+	private String password;
+
+	public String getDriverClassName() {
+		return driverClassName;
+	}
+
+	public void setDriverClassName(String driverClassName) {
+		this.driverClassName = driverClassName;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	@Profile("dev")
+	@Bean
+	public String devDatabaseConnection() {
+		System.out.println("DB connection for DEV - H2");
+		System.out.println(driverClassName);
+		System.out.println(url);
+		return "DB connection for DEV - H2";
+	}
+
+	@Profile("test")
+	@Bean
+	public String testDatabaseConnection() {
+		System.out.println("DB Connection to RDS_TEST - Low Cost Instance");
+		System.out.println(driverClassName);
+		System.out.println(url);
+		return "DB Connection to RDS_TEST - Low Cost Instance";
+	}
+
+	@Profile("prod")
+	@Bean
+	public String prodDatabaseConnection() {
+		System.out.println("DB Connection to RDS_PROD - High Performance Instance");
+		System.out.println(driverClassName);
+		System.out.println(url);
+		return "DB Connection to RDS_PROD - High Performance Instance";
+	} 
+}
+
+We have used the @Profile("Dev")   to let the system know that this is the BEAN  that should be picked up when we set the application profile to DEV. The other two beans will not be created at all.
+
+One last setting is how to let the system know that this is DEV, TEST, or PROD. But, how do we do this?
+
+We will use the application.properties to use the key below:
+
+spring.profiles.active=dev
+
+From here, Spring Boot will know which profile to pick.With the profile in DEV mode, and it should pick H2 DB.
+That's it! We just have to change it once at the application.properties to let Spring Boot know which environment the code is deployed in, and it will do the magic with the setting.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Annotations
 
 @Configuration
