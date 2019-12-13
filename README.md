@@ -382,11 +382,38 @@ Singleton
 
 Prototype
 
+## Life Cycle Methods 
+
+## @PostConstruct
+## @PreDestroy
+
+
+## Aware Interfaces
+
+Spring provides several aware interfaces. These are used to access the Spring Framework infrastructure. The aware interfaces are largely used within the framework and rarely used by Spring programmers.
+
+You as Spring programmers should be familiar with the following three aware interfaces.
+
+   #### BeanFactoryAware: Provides setBeanFactory(), a callback that supplies the owning factory to the bean instance.
+   #### BeanNameAware: ThesetBeanName() callback of this interface supplies the name of the bean.
+   #### ApplicationContextAware: ThesetApplicationContext() method of this interface provides the ApplicationContext object of this bean.
+   
+## Bean Post Processor
+
+Spring provides the BeanPostProcessor interface that gives you the means to tap into the Spring context lifecycle and interact with beans as they are processed.
+
+The BeanPostProcessor interface contains two methods:
+
+   #### postProcessBeforeInitialization: Spring calls this method after calling the methods of the aware interfaces and before any bean initialization callbacks, such as  InitializingBean’s afterPropertiesSet or a custom init-method.
+   #### postProcessAfterInitialization: Spring calls this method after any bean initialization callbacks.
+Spring calls the postProcessBeforeInitialization() method after calling the methods of the aware interfaces.
+
+Spring calls the postProcessAfterInitialization() method after any bean initialization callbacks, such as  InitializingBean’s afterPropertiesSet or a custom init-method. 
 
 
 
 
-
+	
 
 
 
@@ -398,3 +425,11 @@ Prototype
 @Bean
 @Import
 @Profile
+@Component
+@Service
+@Repository
+@Controller
+@RestController
+@Autowired
+@ComponentScan(basePackage="com.")
+
