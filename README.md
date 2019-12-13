@@ -10,14 +10,14 @@ Spring Framework is built on the Inversion of Control principle. Dependency inje
 ### Spring IoC Container
 
 Spring IoC is the mechanism to achieve loose-coupling between Objects dependencies. To achieve loose coupling and dynamic binding of the objects at runtime, objects dependencies are injected by other assembler objects. Spring IoC container is the program that injects dependencies into an object and make it ready for our use.In the Spring framework, the IoC container is represented by the interface ApplicationContext. The Spring container is responsible for instantiating, configuring and assembling objects known as beans, as well as managing their lifecycle.
-# In order to assemble beans, the container uses configuration metadata, which can be in the form of XML configuration or annotations.Dependency Injection in Spring can be done through constructors, setters or fields.
+#### In order to assemble beans, the container uses configuration metadata, which can be in the form of XML configuration or annotations.Dependency Injection in Spring can be done through constructors, setters or fields.
 
 
 Spring IoC container classes are part of  org.springframework.beans and org.springframework.context packages. Spring IoC container provides us different ways to decouple the object dependencies.
 
-# BeanFactory is the root interface of Spring IoC container. 
-# ApplicationContext is the child interface of BeanFactory interface that provide Spring AOP features, i18n etc. 
-# A BeanFactory is essentially nothing more than the interface for an advanced factory capable of maintaining a registry of different beans and their dependencies.
+##### BeanFactory is the root interface of Spring IoC container. 
+##### ApplicationContext is the child interface of BeanFactory interface that provide Spring AOP features, i18n etc. 
+##### A BeanFactory is essentially nothing more than the interface for an advanced factory capable of maintaining a registry of different beans and their dependencies.
 
 ## ApplicationContext
 
@@ -25,26 +25,26 @@ Central interface to provide configuration for an application. This is read-only
 
 An ApplicationContext provides:
 
-   # Bean factory methods for accessing application components. Inherited from ListableBeanFactory.
-   # The ability to load file resources in a generic fashion. Inherited from the ResourceLoader interface.
-   # The ability to publish events to registered listeners. Inherited from the ApplicationEventPublisher interface.
-   # The ability to resolve messages, supporting internationalization. Inherited from the MessageSource interface.
-   # Inheritance from a parent context. Definitions in a descendant context will always take priority. This means, for example, that a single parent context can be used by an entire web application, while each servlet has its own child context that is independent of that of any other servlet. 
+   ##### Bean factory methods for accessing application components. Inherited from ListableBeanFactory.
+   ##### The ability to load file resources in a generic fashion. Inherited from the ResourceLoader interface.
+   ##### The ability to publish events to registered listeners. Inherited from the ApplicationEventPublisher interface.
+   ##### The ability to resolve messages, supporting internationalization. Inherited from the MessageSource interface.
+   ##### Inheritance from a parent context. Definitions in a descendant context will always take priority. This means, for example, that a single parent context can be used by an entire web application, while each servlet has its own child context that is independent of that of any other servlet. 
 
 In addition to standard BeanFactory lifecycle capabilities, ApplicationContext implementations detect and invoke ApplicationContextAware beans as well as ResourceLoaderAware, ApplicationEventPublisherAware and MessageSourceAware beans.
 
 Some of the useful ApplicationContext implementations that we use are;
-# AnnotationConfigApplicationContext:
-# ClassPathXmlApplicationContext:
-# FileSystemXmlApplicationContext
-# AnnotationConfigWebApplicationContext and XmlWebApplicationContext
+##### AnnotationConfigApplicationContext:
+##### ClassPathXmlApplicationContext:
+##### FileSystemXmlApplicationContext
+##### AnnotationConfigWebApplicationContext and XmlWebApplicationContext
 
 ## Spring Bean Configuration
 
 Spring Framework provides three ways to configure beans to be used in the application.
-# Annotation Based Configuration
-# XML Based Configuration
-# Java Based Configuration
+##### Annotation Based Configuration
+##### XML Based Configuration
+##### Java Based Configuration
 
 
 ## Autowiring Dependencies
@@ -52,8 +52,8 @@ Spring Framework provides three ways to configure beans to be used in the applic
 Wiring allows the Spring container to automatically resolve dependencies between collaborating beans by inspecting the beans that have been defined.
 
 There are four modes of autowiring a bean using an XML configuration:
-# no: the default value – this means no autowiring is used for the bean and we have to explicitly name the dependencies
-# byName: autowiring is done based on the name of the property, therefore Spring will look for a bean with the same name as the property that needs to be set
-# byType: similar to the byName autowiring, only based on the type of the property. This means Spring will look for a bean with the same type of the property to set. If there's more than one bean of that type, the framework throws an exception.
-# constructor: autowiring is done based on constructor arguments, meaning Spring will look for beans with the same type as the constructor arguments
+##### no: the default value – this means no autowiring is used for the bean and we have to explicitly name the dependencies
+##### byName: autowiring is done based on the name of the property, therefore Spring will look for a bean with the same name as the property that needs to be set
+##### byType: similar to the byName autowiring, only based on the type of the property. This means Spring will look for a bean with the same type of the property to set. If there's more than one bean of that type, the framework throws an exception.
+##### constructor: autowiring is done based on constructor arguments, meaning Spring will look for beans with the same type as the constructor arguments
 
