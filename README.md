@@ -232,3 +232,9 @@ There are four modes of autowiring a bean using an XML configuration:
 ##### byType: similar to the byName autowiring, only based on the type of the property. This means Spring will look for a bean with the same type of the property to set. If there's more than one bean of that type, the framework throws an exception.
 ##### constructor: autowiring is done based on constructor arguments, meaning Spring will look for beans with the same type as the constructor arguments
 
+
+## Annotations
+
+@Configuration
+@Bean
+@Import
