@@ -411,7 +411,13 @@ Spring calls the postProcessBeforeInitialization() method after calling the meth
 Spring calls the postProcessAfterInitialization() method after any bean initialization callbacks, such as  InitializingBean’s afterPropertiesSet or a custom init-method. 
 
 
+## Add more info 
 
+TBD
+
+## Aspect oriented Programming AOP
+
+TBD
 
 	
 
