@@ -39,6 +39,18 @@ Some of the useful ApplicationContext implementations that we use are;
 ##### FileSystemXmlApplicationContext
 ##### AnnotationConfigWebApplicationContext and XmlWebApplicationContext
 
+### Multiple ApplicationContext in one project
+
+Tt is common to have more than one application context in a Web application, because Spring has a notion of hierachies of ApplicationContext. You could declare them as :
+
+ApplicationContext context1 = new ClassPathXmlApplicationContext("Beans.xml");
+ApplicationContext context2 = new ClassPathXmlApplicationContext("Beans.xml", context1);
+
+Here you can retrieve from context1 only beans declared in it, but from context2 you will retrieve beans from context2 and context1. Specifically, beans are first looked for in context2 and if not found then looked for in context1.
+
+This is used in Spring MVC where you normally have one root context (for all beans not directly related to the MVC DispatcherServlet) and one child context dedicated to the DispatcherServlet that will contain the beans for controllers, views, interceptors, etc.
+
+
 ## Spring Bean Configuration
 
 Spring Framework provides three ways to configure beans to be used in the application.
