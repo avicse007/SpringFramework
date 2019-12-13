@@ -365,11 +365,22 @@ From here, Spring Boot will know which profile to pick.With the profile in DEV m
 That's it! We just have to change it once at the application.properties to let Spring Boot know which environment the code is deployed in, and it will do the magic with the setting.
 
 
+### Set the value for profile:
+
+###### The priority order is :
+###### Context parameter in web.xml
+###### WebApplicationInitializer
+###### JVM System parameter    
+###### Environment variable
 
 
 
 
+## Bean Scope
 
+Singleton
+
+Prototype
 
 
 
@@ -386,3 +397,4 @@ That's it! We just have to change it once at the application.properties to let S
 @Configuration
 @Bean
 @Import
+@Profile
