@@ -50,6 +50,169 @@ Here you can retrieve from context1 only beans declared in it, but from context2
 
 This is used in Spring MVC where you normally have one root context (for all beans not directly related to the MVC DispatcherServlet) and one child context dedicated to the DispatcherServlet that will contain the beans for controllers, views, interceptors, etc.
 
+## The Root Web Application Context
+
+Every Spring webapp has an associated application context that is tied to its lifecycle: the root web application context.
+
+This is an old feature that predates Spring Web MVC, so it's not tied specifically to any web framework technology.
+
+The context is started when the application starts, and it's destroyed when it stops, thanks to a servlet context listener. The most common types of contexts can also be refreshed at runtime, although not all ApplicationContext implementations have this capability.
+
+The context in a web application is always an instance of WebApplicationContext. That's an interface extending ApplicationContext with a contract for accessing the ServletContext.
+
+Anyway, applications usually should not be concerned about those implementation details: the root web application context is simply a centralized place to define shared beans.
+
+## The ContextLoaderListener
+
+The root web application context described in the previous section is managed by a listener of class org.springframework.web.context.ContextLoaderListener, which is part of the spring-web module.
+
+
+## Programmatic Configuration with Servlet 3.x
+
+Version 3 of the Servlet API has made configuration through the web.xml file completely optional. Libraries can provide their web fragments, which are pieces of XML configuration that can register listeners, filters, servlets and so on.
+
+Also, users have access to an API that allows defining programmatically every element of a servlet-based application.
+
+The spring-web module makes use of these features and offers its API to register components of the application when it starts.
+
+Spring scans the application's classpath for instances of the org.springframework.web.WebApplicationInitializer class. This is an interface with a single method, void onStartup(ServletContext servletContext) throws ServletException, that's invoked upon application startup.
+
+
+## Using Servlet 3.x and a Java Application Context
+
+If we want to use an annotation-based context, we could make uso of an AnnotationConfigWebApplicationContext.
+The WebApplicationInitializer class is a general-purpose interface. It turns out that Spring provides a few more specific implementations, including an abstract class called AbstractContextLoaderInitializer.
+Its job, as the name implies, is to create a ContextLoaderListener and register it with the servlet container.We only have to tell it how to build the root context:
+	
+public class AnnotationsBasedApplicationInitializer 
+  extends AbstractContextLoaderInitializer {
+  
+    @Override
+    protected WebApplicationContext createRootApplicationContext() {
+        AnnotationConfigWebApplicationContext rootContext
+          = new AnnotationConfigWebApplicationContext();
+        rootContext.register(RootApplicationConfig.class);
+        return rootContext;
+    }
+}
+
+Here we can see that we no longer need to register the ContextLoaderListener, which saves us from a little bit of boilerplate code.
+
+## Dispatcher Servlet Contexts
+
+Spring MVC applications have at least one Dispatcher Servlet configured (but possibly more than one, we'll talk about that case later). This is the servlet that receives incoming requests, dispatches them to the appropriate controller method, and returns the view.
+
+Each DispatcherServlet has an associated application context. Beans defined in such contexts configure the servlet and define MVC objects like controllers and view resolvers.
+
+### Using Servlet 3.x and a Java Application Context
+
+This time, we'll configure an annotations-based context using a specialized implementation of WebApplicationInitializer: AbstractDispatcherServletInitializer.
+
+That's an abstract class that, besides creating a root web application context as previously seen, allows us to register one dispatcher servlet with minimum boilerplate:
+	
+@Override
+protected WebApplicationContext createServletApplicationContext() {
+  
+    AnnotationConfigWebApplicationContext secureWebAppContext
+      = new AnnotationConfigWebApplicationContext();
+    secureWebAppContext.register(SecureWebAppConfig.class);
+    return secureWebAppContext;
+}
+ 
+@Override
+protected String[] getServletMappings() {
+    return new String[] { "/s/api/*" };
+}
+
+
+## Parent and Child Contexts
+
+So far, we've seen two major types of contexts: the root web application context and the dispatcher servlet contexts. Then, we might have a question: are those contexts related?
+
+It turns out that yes, they are. In fact, the root context is the parent of every dispatcher servlet context. Thus, beans defined in the root web application context are visible to each dispatcher servlet context, but not vice versa.
+
+So, typically, the root context is used to define service beans, while the dispatcher context contains those beans that are specifically related to MVC.
+
+Note that we've also seen ways to create the dispatcher servlet context programmatically. If we manually set its parent, then Spring does not override our decision, and this section no longer applies.
+
+In simpler MVC applications, it's sufficient to have a single context associated to the only one dispatcher servlet. There's no need for overly complex solutions!
+
+Still, the parent-child relationship becomes useful when we have multiple dispatcher servlets configured. But when should we bother to have more than one?
+
+In general, we declare multiple dispatcher servlets when we need multiple sets of MVC configuration
+
+## Spring Boot and Application Context Hierarchy
+
+Consider a contrived use-case of using multiple application contexts and the application context hierarchy — this is to provide two different ports with a different set of endpoints at each of these ports. 
+
+Child1 and Child2 are typical Spring Boot Applications, along these lines:
+
+package child1;   
+
+import org.springframework.beans.factory.annotation.Value; 
+
+import org.springframework.boot.autoconfigure.SpringBootApplication; 
+
+import org.springframework.context.annotation.Bean; 
+
+import org.springframework.context.annotation.PropertySource; 
+
+import root.RootBean;   
+
+@SpringBootApplication 
+
+@PropertySource("classpath:/child1.properties") 
+
+public class ChildContext1 {       
+
+    @Bean     
+
+    public ChildBean1 childBean(RootBean rootBean, 
+
+    @Value("${root.property}") String someProperty) 
+
+    {                        
+
+        return new ChildBean1(rootBean, someProperty);     
+
+    } 
+
+}
+
+
+Each of the applications resides in its own root package to avoid collisions when scanning for beans. Note that the bean in the child contexts depends on a bean that is expected to come from the root context. 
+
+The port to listen on is provided as properties, since the two contexts are expected to listen on different ports I have explicitly specified the property file to load with a content along these lines:
+
+server.port=8080
+
+spring.application.name=child1
+
+
+
+Given this setup, Spring Boot provides a fluid interface to load up the root context and the two child contexts:
+
+SpringApplicationBuilder appBuilder =
+
+       new
+
+SpringApplicationBuilder()
+
+               .parent(RootContext.class)
+
+               .child(ChildContext1.class)
+
+               .sibling(ChildContext2.class);
+
+ConfigurableApplicationContext applicationContext  = appBuilder.run();
+
+
+The application context returned by the SpringBootApplicationBuilder appears to be the final one in the chain, defined via ChildContext2 above.
+
+If the application is now started up, there would be a root context with two different child contexts, each exposing an endpoint via a different port. 
+
+
+
 
 ## Spring Bean Configuration
 
